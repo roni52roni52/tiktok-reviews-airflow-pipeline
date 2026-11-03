@@ -1,0 +1,30 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Airflow runtime
+logs/
+airflow.db
+airflow.cfg
+webserver_config.py
+
+# Generated and source datasets
+data/input/*
+data/staging/*
+data/processed/*
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
