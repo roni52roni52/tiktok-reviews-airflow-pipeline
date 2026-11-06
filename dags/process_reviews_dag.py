@@ -89,7 +89,11 @@ def process_tiktok_reviews() -> None:
                 keep_default_na=False,
             )
 
-            required_columns = {"content", "score", "at"}
+            required_columns = {
+                "content",
+                "score",
+                "at",
+            }
             missing_columns = (
                 required_columns - set(dataframe.columns)
             )
@@ -210,7 +214,9 @@ def process_tiktok_reviews() -> None:
             return PROCESSED_PATH
 
         normalized_file = normalize_columns()
-        nulls_replaced_file = replace_nulls(normalized_file)
+        nulls_replaced_file = replace_nulls(
+            normalized_file
+        )
         sorted_file = sort_by_created_date(
             nulls_replaced_file
         )
