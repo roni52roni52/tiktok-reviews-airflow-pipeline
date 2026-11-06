@@ -45,13 +45,12 @@ def load_reviews_to_mongodb() -> None:
         mongo_hook = MongoHook(
             mongo_conn_id="mongo_default"
         )
-        client = mongo_hook.get_conn()
 
         processed_rows = 0
         inserted_rows = 0
         updated_rows = 0
 
-        try:
+        with mongo_hook.get_conn() as client:
             database = client[DATABASE_NAME]
             collection = database[COLLECTION_NAME]
 
@@ -78,7 +77,9 @@ def load_reviews_to_mongodb() -> None:
 
                 operations = [
                     ReplaceOne(
-                        {"reviewId": document["reviewId"]},
+                        {
+                            "reviewId": document["reviewId"]
+                        },
                         document,
                         upsert=True,
                     )
@@ -97,14 +98,11 @@ def load_reviews_to_mongodb() -> None:
                 inserted_rows += result.upserted_count
                 updated_rows += result.modified_count
 
-            return {
-                "processed_rows": processed_rows,
-                "inserted_rows": inserted_rows,
-                "updated_rows": updated_rows,
-            }
-
-        finally:
-            client.close()
+        return {
+            "processed_rows": processed_rows,
+            "inserted_rows": inserted_rows,
+            "updated_rows": updated_rows,
+        }
 
     @task(task_id="validate_mongodb")
     def validate_mongodb(
@@ -113,9 +111,8 @@ def load_reviews_to_mongodb() -> None:
         mongo_hook = MongoHook(
             mongo_conn_id="mongo_default"
         )
-        client = mongo_hook.get_conn()
 
-        try:
+        with mongo_hook.get_conn() as client:
             collection = (
                 client[DATABASE_NAME][COLLECTION_NAME]
             )
@@ -140,9 +137,6 @@ def load_reviews_to_mongodb() -> None:
             print(f"Load result: {load_result}")
             print(f"MongoDB documents: {mongodb_count}")
             print("MongoDB validation passed.")
-
-        finally:
-            client.close()
 
     load_result = load_reviews()
     validate_mongodb(load_result)
